@@ -1,18 +1,20 @@
+# Use a lightweight Node.js image
 FROM node:20-alpine
 
-RUN addgroup app && adduser -S -G app app
-
+# Set working directory
 WORKDIR /app
 
+# Copy only package files first (to cache dependencies)
 COPY package*.json ./
 
+# Install dependencies using npm ci (faster and more reliable)
 RUN npm install
 
-USER root
-RUN chown -R app:app /app
+# Copy the rest of the files (after dependencies are installed)
+COPY . .
 
-USER app
-
+# Expose Vite's default port
 EXPOSE 5173
 
+# Start the app
 CMD ["npm", "run", "dev"]
